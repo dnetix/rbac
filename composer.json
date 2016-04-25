@@ -1,0 +1,29 @@
+{
+    "name": "dnetix/rbac",
+    "description": "Role Based Access Control Module",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^5.3",
+        "illuminate/support": "^5.2",
+        "illuminate/database": "^5.2",
+        "illuminate/contracts": "^5.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Dnetix\\Rbac\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/BaseTestCase.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Diego Calle",
+            "email": "dnetix@gmail.com"
+        }
+    ]
+}
