@@ -1,6 +1,9 @@
 <?php
 namespace Dnetix\Rbac;
 
+use Dnetix\Dates\DateRangeChecker;
+use Dnetix\Rbac\Contracts\RbacRepository;
+use Dnetix\Rbac\Repositories\EloquentRbacRepository;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,6 +16,9 @@ class RbacServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'rbac');
+        
+        $this->app->bind(RbacRepository::class, EloquentRbacRepository::class);
     }
 
     /**
@@ -20,8 +26,49 @@ class RbacServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(GateContract $gate)
+    public function boot(GateContract $gate, RbacRepository $rbacRepository)
     {
-        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'rbac');
+        // Publishes the migrations for this RBAC module
+        $this->publishes([
+            __DIR__ . '/migrations/2016_04_20_014519_create_rbac_module.php' => base_path('database/migrations/2016_04_20_014519_create_rbac_module.php')
+        ], 'migration');
+        
+        $this->publishes([
+            __DIR__.'/config/config.php' => config_path('rbac.php'),
+        ], 'config');
+
+        $this->definePermissions($gate, $rbacRepository);
+        
+        // Register the after an authorization check has been made to log the operations with the results
+        if(config('rbac.log_callback')) {
+            $gate->after(config('rbac.log_callback'));
+        }
+    }
+
+    protected function definePermissions($gate, $repository)
+    {
+        foreach ($repository->getPermissions() as $permissionSlug => $extra){
+            // Checks if the configuration for this permissions has a callback
+            if(isset($extra['callback'])){
+                $gate->define($permissionSlug, $extra['callback']);
+            }else{
+                // Use the default callback for the permission check
+                
+                $gate->define($permissionSlug, function($user) use ($repository, $permissionSlug, $extra){
+
+                    // if the permission has a date range in which its allowed, but if its true still checks for the proper roles
+                    if(isset($extra['date_range']) && !DateRangeChecker::load($extra['date_range'])->check()){
+                        return false;
+                    }
+                    
+                    $roles = $repository->getRolesByAuthenticatableAndPermission($user, $permissionSlug);
+                    // The user has at least one role that grants this permission
+                    if($roles->count() > 0){
+                        return true;
+                    }
+
+                });
+            }
+        }
     }
 }
