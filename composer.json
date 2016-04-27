@@ -3,6 +3,7 @@
     "description": "Role Based Access Control Module",
     "type": "library",
     "require": {
+    	"php": ">=5.6",
         "dnetix/utils": "dev-master"
     },
     "require-dev": {
