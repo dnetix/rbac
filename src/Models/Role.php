@@ -41,4 +41,13 @@ class Role extends Model
 
     /* Eloquent Relationships */
 
+    public function permissionRoles()
+    {
+        return $this->belongsToMany(PermissionRole::class);
+    }
+
+    public function authenticatableRoles()
+    {
+        return $this->belongsToMany(AuthenticatableRole::class);
+    }
 }

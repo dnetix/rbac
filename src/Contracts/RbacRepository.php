@@ -2,9 +2,10 @@
 
 namespace Dnetix\Rbac\Contracts;
 
-
 use Dnetix\Rbac\Models\AuthenticatableRole;
+use Dnetix\Rbac\Models\PermissionRole;
 use Dnetix\Rbac\Models\Role;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 
 interface RbacRepository
@@ -53,27 +54,45 @@ interface RbacRepository
      * @param $id
      * @return Collection
      */
-    public function getPermissionRoleByRoleId($id);
+    public function getPermissionRolesByRoleId($id);
 
     /**
      * Returns the roles assigned to an authenticatable (User)
      * @param $authenticatable
-     * @return mixed
+     * @return Collection
      */
-    public function getRolesOfAuthenticatable($authenticatable);
+    public function getRolesOfAuthenticatable(Authenticatable $authenticatable);
 
     /**
-     * Returns the authenticatables that has a specific role
+     * Returns the authenticatables roles models that has a specific role you can fetch the authenticatable
+     * property to obtain the authenticatable
      * @param $id
      * @return mixed
      */
-    public function getAuthenticatablesOfRoleById($id);
+    public function getAuthenticatableRolesByRoleId($id);
 
     /**
      * @param $authenticatable
      * @param $role
      * @return AuthenticatableRole
      */
-    public function assignRoleToAuthenticatable($authenticatable, $role);
+    public function assignAuthenticatableToRole(Authenticatable $authenticatable, $role);
+
+    /**
+     * Creates a new PermissionRole object that relates a permission slug to
+     * a role
+     * @param $permission
+     * @param $role
+     * @return PermissionRole
+     */
+    public function assignPermissionToRole($permission, $role);
+
+    /**
+     * Returns all the roles that have the authenticatable and permission
+     * @param Authenticatable $authenticatable
+     * @param $permission
+     * @return Collection
+     */
+    public function getRolesByAuthenticatableAndPermission(Authenticatable $authenticatable, $permission);
 
 }

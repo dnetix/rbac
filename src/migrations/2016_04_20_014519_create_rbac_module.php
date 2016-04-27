@@ -12,6 +12,7 @@ class CreateRbacModule extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('description')->nullable();
+            $table->string('date_range')->nullable();
             $table->timestamps();
         });
 
@@ -19,6 +20,7 @@ class CreateRbacModule extends Migration
             $table->increments('id');
             $table->string('permission');
             $table->integer('role_id')->unsigned();
+            $table->timestamps();
 
             $table->foreign('role_id')->references('id')->on('roles');
         });
@@ -27,9 +29,10 @@ class CreateRbacModule extends Migration
             $table->integer('authenticatable_id')->unsigned();
             $table->string('authenticatable_type');
             $table->integer('role_id')->unsigned();
+            $table->timestamps();
 
             $table->foreign('role_id')->references('id')->on('roles');
-            $table->primary(['authenticatable_id', 'authenticatable_type', 'role_id']);
+            $table->primary(['authenticatable_id', 'authenticatable_type', 'role_id'], 'authenticatable_id_type_role');
         });
     }
 
