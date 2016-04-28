@@ -1,5 +1,7 @@
 # Role Based Access Control
 
+![TravisCI for dnetix/rbac](https://travis-ci.org/dnetix/rbac.svg)
+
 ## Installation
 
 With composer
