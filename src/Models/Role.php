@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $slug
  * @property string $description
+ * @property string $access_date_range
  */
 class Role extends Model
 {
@@ -16,7 +17,8 @@ class Role extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description'
+        'description',
+        'access_date_range'
     ];
 
     public function id()
@@ -37,6 +39,11 @@ class Role extends Model
     public function description()
     {
         return $this->description;
+    }
+
+    public function accessDateRange()
+    {
+        return $this->access_date_range ?: 'A';
     }
 
     /* Eloquent Relationships */
