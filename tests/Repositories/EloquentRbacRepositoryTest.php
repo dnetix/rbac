@@ -19,11 +19,11 @@ class EloquentRbacRepositoryTest extends BaseTestCase
 	 */
 	public function createRole($attributes = []){
 		$faker = \Faker\Factory::create();
-		return \Dnetix\Rbac\Models\Role::create(array_merge([
+		return $this->repository->storeRole(new \Dnetix\Rbac\Models\Role(array_merge([
 			'name' => $faker->name,
 			'slug' => $faker->slug,
 			'description' => $faker->text
-		], $attributes));
+		], $attributes)));
 	}
 
 	/**
@@ -181,6 +181,74 @@ class EloquentRbacRepositoryTest extends BaseTestCase
 		
 		$user = $authenticatables->first()->authenticatable;
 		$this->assertEquals($user_1->id(), $user->id());
+	}
+
+	public function testItDissociatesRolesFromUser()
+	{
+		$this->setUpDatabase();
+
+		$user_1 = $this->createUser();
+		$user_2 = $this->createUser();
+
+		$role_1 = $this->createRole();
+		$role_2 = $this->createRole();
+
+		$this->repository->assignAuthenticatableToRole($user_1, $role_1);
+		$this->repository->assignAuthenticatableToRole($user_1, $role_2);
+		$this->repository->assignAuthenticatableToRole($user_2, $role_2);
+
+		// Check if there is the two roles assigned to the user_1
+		$roles = $this->repository->getRolesOfAuthenticatable($user_1);
+		$this->assertSame(2, $roles->count());
+		
+		// Dissociate
+		$this->repository->dissociateAuthenticatableOfRole($user_1, $role_1);
+		
+		// Now should be only one role for the user
+		$roles = $this->repository->getRolesOfAuthenticatable($user_1);
+		$this->assertSame(1, $roles->count());
+	}
+
+	public function testItRevokesPermissionsFromRoles()
+	{
+		$this->setUpDatabase();
+		
+		$role_1 = $this->createRole();
+		$role_2 = $this->createRole();
+
+		$this->assignPermissionToRole('permission.test', $role_1);
+		$this->assignPermissionToRole('permission.test1', $role_1);
+		$this->assignPermissionToRole('permission.test', $role_2);
+		
+		$permissionsOfRole = $this->repository->getPermissionRolesByRoleId($role_1->id());
+		$this->assertEquals(2, $permissionsOfRole->count());
+		
+		$this->repository->revokePermissionToRole('permission.test', $role_1);
+		
+		$permissionsOfRole = $this->repository->getPermissionRolesByRoleId($role_1->id());
+		$this->assertEquals(1, $permissionsOfRole->count());
+
+		// Checks that the permission for the role_2 its still there
+		$permissionsOfRole = $this->repository->getPermissionRolesByRoleId($role_2->id());
+		$this->assertEquals(1, $permissionsOfRole->count());
+	}
+
+	public function testItGetsAllThePermissionsOfARole()
+	{
+		$this->setUpDatabase();
+
+		$role_1 = $this->createRole();
+		$role_2 = $this->createRole();
+
+		$this->assignPermissionToRole('permission.test', $role_1);
+		$this->assignPermissionToRole('permission.test1', $role_1);
+		$this->assignPermissionToRole('permission.test', $role_2);
+		
+		$permissions = $this->repository->getPermissionsOfRole($role_1);
+
+		$this->assertEquals(2, sizeof($permissions));
+		$this->assertTrue(in_array('permission.test', $permissions));
+		$this->assertTrue(in_array('permission.test1', $permissions));
 	}
 
 }

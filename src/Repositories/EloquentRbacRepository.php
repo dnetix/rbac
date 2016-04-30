@@ -170,4 +170,64 @@ class EloquentRbacRepository implements RbacRepository
             ->where('permission_role.permission', $permission)
             ->get();
     }
+
+    /**
+     * Persist in the database the role passed
+     * @param Role $role
+     * @return Role
+     */
+    public function storeRole(Role $role)
+    {
+        $role->save();
+        return $role;
+    }
+
+    /**
+     * Removes a role from an authenticatable
+     * @param Authenticatable $authenticatable
+     * @param $role
+     * @return mixed
+     */
+    public function dissociateAuthenticatableOfRole(Authenticatable $authenticatable, $role)
+    {
+        if($role instanceof Role){
+            $role = $role->id();
+        }
+        return AuthenticatableRole::where('authenticatable_id', $authenticatable->getAuthIdentifier())
+            ->where('authenticatable_type', get_class($authenticatable))
+            ->where('role_id', $role)
+            ->delete();
+    }
+
+    /**
+     * @param $permission
+     * @param $role
+     * @return mixed
+     */
+    public function revokePermissionToRole($permission, $role)
+    {
+        if($role instanceof Role){
+            $role = $role->id();
+        }
+        
+        return PermissionRole::where('role_id', $role)
+            ->where('permission', $permission)
+            ->delete();
+    }
+
+    /**
+     * Returns an array with the slugs of the permissions associated with the role
+     * @param $role
+     * @return array
+     */
+    public function getPermissionsOfRole($role)
+    {
+        if($role instanceof Role){
+            $role = $role->id();
+        }
+        return PermissionRole::where('role_id', $role)
+            ->get()
+            ->lists('permission')
+            ->toArray();
+    }
 }

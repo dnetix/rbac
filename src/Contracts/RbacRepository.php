@@ -31,6 +31,13 @@ interface RbacRepository
     public function getRoles();
 
     /**
+     * Persist in the database the role passed
+     * @param Role $role
+     * @return Role
+     */
+    public function storeRole(Role $role);
+
+    /**
      * @param $id
      * @return mixed
      */
@@ -48,6 +55,13 @@ interface RbacRepository
      * @return Collection
      */
     public function getPermissionRoleByPermissionSlug($slug);
+
+    /**
+     * Returns an array with the slugs of the permissions associated with the role
+     * @param $role
+     * @return array
+     */
+    public function getPermissionsOfRole($role);
 
     /**
      * Returns the permissions allowed to a specific Role
@@ -79,6 +93,14 @@ interface RbacRepository
     public function assignAuthenticatableToRole(Authenticatable $authenticatable, $role);
 
     /**
+     * Removes a role from an authenticatable
+     * @param Authenticatable $authenticatable
+     * @param $role
+     * @return mixed
+     */
+    public function dissociateAuthenticatableOfRole(Authenticatable $authenticatable, $role);
+    
+    /**
      * Creates a new PermissionRole object that relates a permission slug to
      * a role
      * @param $permission
@@ -87,6 +109,13 @@ interface RbacRepository
      */
     public function assignPermissionToRole($permission, $role);
 
+    /**
+     * @param $permission
+     * @param $role
+     * @return mixed
+     */
+    public function revokePermissionToRole($permission, $role);
+    
     /**
      * Returns all the roles that have the authenticatable and permission
      * @param Authenticatable $authenticatable

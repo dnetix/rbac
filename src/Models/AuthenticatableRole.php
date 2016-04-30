@@ -23,4 +23,9 @@ class AuthenticatableRole extends Model
     	return $this->morphTo();
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
 }
