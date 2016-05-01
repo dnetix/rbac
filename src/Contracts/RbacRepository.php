@@ -36,6 +36,13 @@ interface RbacRepository
      * @return Role
      */
     public function storeRole(Role $role);
+    
+    /**
+     * Persist in the database the role passed
+     * @param Role $role
+     * @return Role
+     */
+    public function updateRole(Role $role);
 
     /**
      * @param $id

@@ -183,6 +183,17 @@ class EloquentRbacRepository implements RbacRepository
     }
 
     /**
+     * Persist in the database the role passed
+     * @param Role $role
+     * @return Role
+     */
+    public function updateRole(Role $role)
+    {
+        $role->save();
+        return $role;
+    }
+
+    /**
      * Removes a role from an authenticatable
      * @param Authenticatable $authenticatable
      * @param $role

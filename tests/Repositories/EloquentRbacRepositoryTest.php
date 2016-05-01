@@ -251,4 +251,31 @@ class EloquentRbacRepositoryTest extends BaseTestCase
 		$this->assertTrue(in_array('permission.test1', $permissions));
 	}
 
+	public function testItUpdatesTheRoleInformation()
+	{
+		$this->setUpDatabase();
+		
+		$role = $this->createRole([
+			'name' => 'Testing',
+			'slug' => 'testing',
+			'access_date_range' => 'LV8-12'
+		]);
+		
+		$role->fill([
+			'name' => 'Updated',
+			'slug' => 'updated',
+			'access_date_range' => 'S'
+		]);
+		
+		// Updating the role
+		$this->repository->updateRole($role);
+		
+		// Obtaining from the database again to check
+		$role = $this->repository->getRoleById(1);
+		
+		$this->assertEquals('Updated', $role->name());
+		$this->assertEquals('updated', $role->slug());
+		$this->assertEquals('S', $role->accessDateRange());
+	}
+
 }
