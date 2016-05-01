@@ -1,10 +1,11 @@
 {
     "name": "dnetix/rbac",
+    "version": "0.1.0",
     "description": "Role Based Access Control Module",
     "type": "library",
     "require": {
     	"php": ">=5.6",
-        "dnetix/utils": "dev-master"
+        "dnetix/utils": "^0.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.3",
@@ -29,5 +30,7 @@
             "name": "Diego Calle",
             "email": "dnetix@gmail.com"
         }
-    ]
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
