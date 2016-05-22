@@ -49,26 +49,31 @@ class RbacServiceProvider extends ServiceProvider
     {
         foreach ($repository->getPermissions() as $permissionSlug => $extra){
             // Checks if the configuration for this permissions has a callback
-            if(isset($extra['callback'])){
-                $gate->define($permissionSlug, $extra['callback']);
-            }else{
-                // Use the default callback for the permission check
-                
-                $gate->define($permissionSlug, function($user) use ($repository, $permissionSlug, $extra){
 
-                    // if the permission has a date range in which its allowed, but if its true still checks for the proper roles
-                    if(isset($extra['date_range']) && !DateRangeChecker::load($extra['date_range'])->check()){
-                        return false;
-                    }
-                    
-                    $roles = $repository->getRolesByAuthenticatableAndPermission($user, $permissionSlug);
-                    // The user has at least one role that grants this permission
-                    if($roles->count() > 0){
+            $gate->define($permissionSlug, function($user) use ($repository, $permissionSlug, $extra){
+
+                // if the permission has a date range in which its allowed, but if its true still checks for the proper roles
+                if(isset($extra['date_range']) && !DateRangeChecker::load($extra['date_range'])->check()){
+                    return false;
+                }
+
+                $roles = $repository->getRolesByAuthenticatableAndPermission($user, $permissionSlug);
+                // The user has at least one role that grants this permission
+                if($roles->count() > 0){
+
+                    if(isset($extra['callback']) && is_callable($extra['callback'])) {
+                        // Returns the result for the callable function
+                        return (call_user_func_array($extra['callback'], func_get_args()));
+                    }else{
+                        // There is no callable so its true
                         return true;
                     }
 
-                });
-            }
+                }
+
+                return false;
+
+            });
         }
     }
 }

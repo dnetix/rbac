@@ -1,6 +1,6 @@
 {
     "name": "dnetix/rbac",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Role Based Access Control Module",
     "type": "library",
     "require": {
@@ -30,7 +30,5 @@
             "name": "Diego Calle",
             "email": "dnetix@gmail.com"
         }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    ]
 }
